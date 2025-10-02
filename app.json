@@ -3,6 +3,17 @@
     "name": "fintrack",
     "slug": "fintrack",
     "version": "1.0.0",
+    "extra": {
+      "firebase": {
+        "apiKey": "AIzaSyAA9RdYKCydduP3osyYNdpF3U0qniKkp9w",
+        "authDomain": "fintrack-329d1.firebaseapp.com",
+        "projectId": "fintrack-329d1",
+        "storageBucket": "fintrack-329d1.firebasestorage.app",
+        "messagingSenderId": "258361856645",
+        "appId": "1:258361856645:web:c729866a00b3e1cd510fec",
+        "measurementId": "G-XNNLN5GBMH"
+      }
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,17 +24,33 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.fintrack",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.yourname.fintrack",
+      "permissions": ["NOTIFICATIONS"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-sqlite",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2563eb"
+        }
+      ]
+    ]
   }
 }
