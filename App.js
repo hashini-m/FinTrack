@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { onAuthStateChanged } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
 
 import { runMigrations } from "./src/storage/db";
 import { auth } from "./src/firebase"; // initializes Firebase via src/firebase/index.js
@@ -53,12 +54,30 @@ function AddTransactionStack() {
 
 function AppStack() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === "Home") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "Analytics") {
+            iconName = focused ? "bar-chart" : "bar-chart-outline";
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: "#0d9488", // teal when active
+        tabBarInactiveTintColor: "gray",
+      })}
+    >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
+      {/* hidden AddTransaction route */}
       <Tab.Screen
         name="AddTransaction"
-        component={AddTransactionScreen} // directly
+        component={AddTransactionScreen}
         options={{ tabBarButton: () => null, headerShown: false }}
       />
     </Tab.Navigator>
