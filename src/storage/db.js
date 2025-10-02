@@ -12,6 +12,7 @@ export async function openDB() {
 export async function runMigrations() {
   const database = await openDB();
 
+  // Transactions table (with address)
   await database.execAsync(`
     CREATE TABLE IF NOT EXISTS transactions (
       id TEXT PRIMARY KEY NOT NULL,
@@ -27,10 +28,21 @@ export async function runMigrations() {
       photo_uri TEXT,
       latitude REAL,
       longitude REAL,
+      address TEXT,             -- ✅ added
       synced INTEGER DEFAULT 0
     );
   `);
 
+  // Safe migration if table already existed
+  try {
+    await database.execAsync(
+      "ALTER TABLE transactions ADD COLUMN address TEXT;"
+    );
+  } catch (e) {
+    // Ignore if column already exists
+  }
+
+  // Categories table
   await database.execAsync(`
     CREATE TABLE IF NOT EXISTS categories (
       id TEXT PRIMARY KEY NOT NULL,

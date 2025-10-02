@@ -3,7 +3,7 @@ import { View, Text, Image, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function ExpenseCard({
-  id, // ✅ make sure we receive id
+  id,
   type,
   amount,
   currency = "LKR",
@@ -13,21 +13,22 @@ export default function ExpenseCard({
   photo_uri,
   latitude,
   longitude,
-  onDelete, // ✅ callback from parent
+  address,
+  onDelete,
 }) {
   const isExpense = type === "expense";
 
   return (
     <View
       style={{
-        backgroundColor: "#fff",
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 12,
+        backgroundColor: "#ffffff",
+        padding: 14,
+        borderRadius: 14,
+        marginBottom: 14,
         shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 3,
       }}
     >
       {/* Top row: amount + date + delete */}
@@ -41,52 +42,76 @@ export default function ExpenseCard({
         <View>
           <Text
             style={{
-              fontSize: 18,
-              fontWeight: "600",
-              color: isExpense ? "red" : "green",
+              fontSize: 20,
+              fontWeight: "700",
+              color: isExpense ? "#dc2626" : "#16a34a",
             }}
           >
             {isExpense ? "-" : "+"}
             {amount} {currency}
           </Text>
-          <Text style={{ fontSize: 12, color: "#6b7280" }}>
+          <Text style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>
             {new Date(created_at).toLocaleString()}
           </Text>
         </View>
 
         {/* Trash icon */}
         <Pressable
-          hitSlop={8}
-          onPress={() => {
-            console.log("Trash tapped, id =", id); // ✅ should log immediately
-            onDelete?.(id);
+          hitSlop={12}
+          onPress={() => onDelete?.(id)}
+          style={{
+            backgroundColor: "#f1f5f9",
+            padding: 6,
+            borderRadius: 8,
           }}
         >
-          <Ionicons name="trash-outline" size={22} color="gray" />
+          <Ionicons name="trash-outline" size={20} color="#475569" />
         </Pressable>
       </View>
 
+      {/* Divider */}
+      <View
+        style={{
+          height: 1,
+          backgroundColor: "#f1f5f9",
+          marginVertical: 10,
+        }}
+      />
+
       {/* Category & Note */}
-      <Text style={{ fontSize: 14, marginTop: 4 }}>
-        <Text style={{ fontWeight: "600" }}>{category}</Text>
-        {note ? ` • ${note}` : ""}
+      <Text style={{ fontSize: 15, marginBottom: 6 }}>
+        <Text style={{ fontWeight: "600", color: "#0f172a" }}>{category}</Text>
+        {note ? <Text style={{ color: "#475569" }}> • {note}</Text> : null}
       </Text>
 
-      {/* Photo & Location */}
-      <View
-        style={{ flexDirection: "row", marginTop: 8, alignItems: "center" }}
-      >
+      {/* Photo & Address */}
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
         {photo_uri ? (
           <Image
             source={{ uri: photo_uri }}
-            style={{ width: 40, height: 40, borderRadius: 6, marginRight: 8 }}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 10,
+              marginRight: 10,
+            }}
           />
         ) : null}
-        {latitude && longitude ? (
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Ionicons name="location" size={16} color="#2563eb" />
-            <Text style={{ fontSize: 12, marginLeft: 4 }}>
-              {latitude.toFixed(3)}, {longitude.toFixed(3)}
+
+        {address ? (
+          <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+            <Ionicons name="location" size={16} color="#0d9488" />
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{
+                fontSize: 12,
+                marginLeft: 4,
+                color: "#475569",
+                flexShrink: 1,
+              }}
+            >
+              {address}
             </Text>
           </View>
         ) : null}

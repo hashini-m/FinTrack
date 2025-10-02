@@ -14,7 +14,6 @@ import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import { addTransaction } from "../services/transactionService";
 import { auth } from "../firebase";
-
 import { syncPendingTransactions } from "../services/syncService";
 
 export default function AddTransactionScreen({ navigation }) {
@@ -24,6 +23,7 @@ export default function AddTransactionScreen({ navigation }) {
   const [note, setNote] = useState("");
   const [photoUri, setPhotoUri] = useState(null);
   const [coords, setCoords] = useState(null);
+  const [address, setAddress] = useState(null); // ✅ added state
 
   const onTakePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -52,10 +52,19 @@ export default function AddTransactionScreen({ navigation }) {
 
     const loc = await Location.getCurrentPositionAsync({});
     setCoords({ lat: loc.coords.latitude, lon: loc.coords.longitude });
-    Alert.alert(
-      "Location saved",
-      `Lat: ${loc.coords.latitude}, Lon: ${loc.coords.longitude}`
-    );
+
+    // Reverse geocode
+    const [addr] = await Location.reverseGeocodeAsync({
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude,
+    });
+
+    const prettyAddress = `${addr.name || ""} ${addr.street || ""}, ${
+      addr.city || addr.region || ""
+    }, ${addr.country || ""}`;
+
+    setAddress(prettyAddress);
+    Alert.alert("Location saved", prettyAddress);
   };
 
   const onSave = async () => {
@@ -70,6 +79,7 @@ export default function AddTransactionScreen({ navigation }) {
         photo_uri: photoUri,
         latitude: coords?.lat,
         longitude: coords?.lon,
+        address: address || null, // ✅ save address
       });
       await syncPendingTransactions();
 
@@ -155,7 +165,7 @@ export default function AddTransactionScreen({ navigation }) {
         <Button title="Get Location" onPress={onGetLocation} />
         {coords && (
           <Text style={{ marginVertical: 8 }}>
-            📍 {coords.lat}, {coords.lon}
+            📍 {address ? address : `${coords.lat}, ${coords.lon}`}
           </Text>
         )}
 

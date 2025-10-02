@@ -105,7 +105,22 @@ export default function HomeScreen({ navigation }) {
         {/* Add Transaction Button */}
         <Button
           mode="contained"
-          style={{ marginBottom: 16, borderRadius: 8 }}
+          icon="plus-circle-outline"
+          buttonColor="#0d9488" // teal green
+          textColor="white"
+          style={{
+            marginBottom: 16,
+            borderRadius: 12,
+            elevation: 4, // shadow on Android
+          }}
+          labelStyle={{
+            fontSize: 16,
+            fontWeight: "600",
+            letterSpacing: 0.5,
+          }}
+          contentStyle={{
+            paddingVertical: 6, // makes it taller
+          }}
           onPress={() => navigation.navigate("AddTransaction")}
         >
           Add Transaction
@@ -117,7 +132,7 @@ export default function HomeScreen({ navigation }) {
         {transactions.map((item) => (
           <ExpenseCard
             key={item.id}
-            id={item.id} // ✅ pass id
+            id={item.id}
             type={item.type}
             amount={item.amount}
             currency={item.currency}
@@ -127,28 +142,8 @@ export default function HomeScreen({ navigation }) {
             photo_uri={item.photo_uri}
             latitude={item.latitude}
             longitude={item.longitude}
-            onDelete={(id) => {
-              console.log("onDelete called with id =", id); // ✅ should log as soon as icon tapped
-              Alert.alert("Delete Transaction", "Are you sure?", [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Delete",
-                  style: "destructive",
-                  onPress: async () => {
-                    try {
-                      await deleteTransaction(auth.currentUser.uid, id);
-                      await loadData(); // refresh
-                      setSnackbarMsg("✅ Transaction deleted");
-                      setSnackbarVisible(true);
-                    } catch (e) {
-                      console.error("Delete failed", e);
-                      setSnackbarMsg("❌ Failed to delete");
-                      setSnackbarVisible(true);
-                    }
-                  },
-                },
-              ]);
-            }}
+            address={item.address} // ✅ now passed
+            onDelete={(id) => handleDelete(id)}
           />
         ))}
       </ScrollView>
