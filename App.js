@@ -56,16 +56,14 @@ function AppStack() {
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
-      {/* AddTransaction screen is navigated programmatically, not in tab bar */}
       <Tab.Screen
         name="AddTransaction"
-        component={AddTransactionStack}
+        component={AddTransactionScreen} // directly
         options={{ tabBarButton: () => null, headerShown: false }}
       />
     </Tab.Navigator>
   );
 }
-
 export default function App() {
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);

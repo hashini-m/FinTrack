@@ -13,12 +13,18 @@ import ExpenseCard from "../components/ExpenseCard";
 import { Appbar, Badge, Card, Text, Button, Divider } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import HeaderRibbon from "../components/HeaderRibbon";
+import { deleteTransaction } from "../services/transactionService";
+import { Snackbar } from "react-native-paper";
+import { Alert } from "react-native";
 
 export default function HomeScreen({ navigation }) {
   const [transactions, setTransactions] = useState([]);
   const [isOnline, setIsOnline] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
   const [progress, setProgress] = useState(0);
+
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
 
   const loadData = async () => {
     const res = await getTransactions(auth.currentUser.uid);
@@ -71,27 +77,21 @@ export default function HomeScreen({ navigation }) {
         title="Home"
         pendingCount={pendingCount}
         onSignOut={onSignOut}
+        isOnline={isOnline}
       />
       <ScrollView contentContainerStyle={{ padding: 12 }}>
-        {/* Online/Offline Banner */}
-        <Card
-          style={{
-            marginBottom: 12,
-            backgroundColor: isOnline ? "#dcfce7" : "#fee2e2",
-          }}
-        >
-          <Card.Content>
-            <Text
-              style={{ color: isOnline ? "green" : "red", fontWeight: "bold" }}
-            >
-              {isOnline ? "Online ✅" : "Offline ⚠️"}
-            </Text>
-          </Card.Content>
-        </Card>
-
         {/* Progress Ring */}
         <Card style={{ marginBottom: 12 }}>
           <Card.Content style={{ alignItems: "center" }}>
+            {/* Current Month */}
+            <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 10 }}>
+              {new Date().toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+              })}
+            </Text>
+
+            {/* Progress Ring */}
             <ProgressRing
               radius={70}
               strokeWidth={14}
@@ -117,6 +117,7 @@ export default function HomeScreen({ navigation }) {
         {transactions.map((item) => (
           <ExpenseCard
             key={item.id}
+            id={item.id} // ✅ pass id
             type={item.type}
             amount={item.amount}
             currency={item.currency}
@@ -126,9 +127,42 @@ export default function HomeScreen({ navigation }) {
             photo_uri={item.photo_uri}
             latitude={item.latitude}
             longitude={item.longitude}
+            onDelete={(id) => {
+              console.log("onDelete called with id =", id); // ✅ should log as soon as icon tapped
+              Alert.alert("Delete Transaction", "Are you sure?", [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: async () => {
+                    try {
+                      await deleteTransaction(auth.currentUser.uid, id);
+                      await loadData(); // refresh
+                      setSnackbarMsg("✅ Transaction deleted");
+                      setSnackbarVisible(true);
+                    } catch (e) {
+                      console.error("Delete failed", e);
+                      setSnackbarMsg("❌ Failed to delete");
+                      setSnackbarVisible(true);
+                    }
+                  },
+                },
+              ]);
+            }}
           />
         ))}
       </ScrollView>
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        duration={1000}
+        action={{
+          label: "Close",
+          onPress: () => setSnackbarVisible(false),
+        }}
+      >
+        {snackbarMsg}
+      </Snackbar>
     </SafeAreaView>
   );
 }

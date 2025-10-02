@@ -3,11 +3,16 @@ import { View } from "react-native";
 import { Text, Badge, Button } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function HeaderRibbon({ title, pendingCount = 0, onSignOut }) {
+export default function HeaderRibbon({
+  title,
+  pendingCount = 0,
+  onSignOut,
+  isOnline,
+}) {
   return (
     <View
       style={{
-        height: 50,
+        height: 60,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -16,15 +21,34 @@ export default function HeaderRibbon({ title, pendingCount = 0, onSignOut }) {
       }}
     >
       {/* Breadcrumb text */}
-      <Text>
-        <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>
-          FinTrack
+      <View>
+        {/* Breadcrumb */}
+        <Text>
+          <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>
+            FinTrack
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: "400",
+              color: "white",
+            }}
+          >
+            {"   "}/ {title} {/* ✅ use spaces here */}
+          </Text>
         </Text>
-        <Text style={{ fontSize: 14, fontWeight: "400", color: "white" }}>
-          {" "}
-          / {title}
+
+        {/* Online/Offline status */}
+        <Text
+          style={{
+            marginTop: 4, // adds spacing below breadcrumb
+            color: isOnline ? "lightgreen" : "#f87171",
+            fontWeight: "bold",
+          }}
+        >
+          {isOnline ? "Online ✅" : "Offline ⚠️"}
         </Text>
-      </Text>
+      </View>
 
       {/* Right side: pending badge + logout */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
