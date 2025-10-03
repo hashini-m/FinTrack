@@ -184,7 +184,7 @@ export default function AnalyticsScreen() {
                     population: d.amount,
                     color: d.color,
                   }))}
-                  width={screenWidth - 48}
+                  width={screenWidth}
                   height={220}
                   chartConfig={{
                     backgroundColor: "#fff",
@@ -197,6 +197,10 @@ export default function AnalyticsScreen() {
                   paddingLeft="15"
                   absolute
                   hasLegend={false} // ✅ hides default legend
+                  style={{
+                    alignSelf: "center",
+                    marginLeft: 150, // ✅ shift chart slightly right
+                  }}
                 />
 
                 {/* Divider */}

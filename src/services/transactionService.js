@@ -85,3 +85,26 @@ export async function deleteTransaction(user_id, id) {
     id,
   ]);
 }
+
+// Group transactions by YYYY-MM
+export function groupTransactionsByMonth(transactions) {
+  const grouped = {};
+
+  transactions.forEach((t) => {
+    // Ensure created_at is valid
+    const date = new Date(t.created_at);
+    if (isNaN(date)) {
+      console.warn("Invalid date in transaction:", t.created_at);
+      return;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // 01–12
+    const key = `${year}-${month}`;
+
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(t);
+  });
+
+  return grouped;
+}
