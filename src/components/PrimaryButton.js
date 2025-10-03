@@ -12,7 +12,7 @@ export default function PrimaryButton({
   return (
     <Button
       mode="contained"
-      icon={icon}
+      // icon={icon}
       buttonColor="#0d9488" // teal green
       textColor="white"
       style={[

@@ -2,20 +2,19 @@ import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
-
-import { signOut } from "firebase/auth";
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 import { runMigrations } from "./src/storage/db";
-import { auth } from "./src/firebase"; // initializes Firebase via src/firebase/index.js
+import { auth } from "./src/firebase";
 
 import HomeScreen from "./src/screens/HomeScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import AnalyticsScreen from "./src/screens/AnalyticsScreen";
 import SignupScreen from "./src/screens/SignupScreen";
 import AddTransactionScreen from "./src/screens/AddTransactionScreen";
+
 import NetInfo from "@react-native-community/netinfo";
 import { syncPendingTransactions } from "./src/services/syncService";
 import {
@@ -26,7 +25,7 @@ import {
 import { Provider as PaperProvider } from "react-native-paper";
 
 const AuthStackNav = createNativeStackNavigator();
-const AppStackNav = createNativeStackNavigator();
+const RootStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function AuthStack() {
@@ -46,23 +45,14 @@ function AuthStack() {
   );
 }
 
-// Stack inside tab for hiding AddTransaction
-function AddTransactionStack() {
-  return (
-    <AddStack.Navigator>
-      <AddStack.Screen name="AddTransaction" component={AddTransactionScreen} />
-    </AddStack.Navigator>
-  );
-}
-
-function AppStack() {
+// --- Bottom Tabs ---
+function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Analytics") {
@@ -70,10 +60,9 @@ function AppStack() {
           } else if (route.name === "Logout") {
             iconName = focused ? "log-out" : "log-out-outline";
           }
-
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#0d9488", // teal
+        tabBarActiveTintColor: "#0d9488",
         tabBarInactiveTintColor: "gray",
       })}
     >
@@ -83,11 +72,11 @@ function AppStack() {
       {/* Logout Tab */}
       <Tab.Screen
         name="Logout"
-        component={HomeScreen} // dummy, not used
+        component={HomeScreen} // dummy
         options={{
           tabBarLabel: "Logout",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="log-out-outline" size={size} color={color} />
+          tabBarIcon: ({ size }) => (
+            <Ionicons name="log-out-outline" size={size} color="#dc2626" />
           ),
           tabBarButton: (props) => (
             <TouchableOpacity
@@ -100,6 +89,19 @@ function AppStack() {
         }}
       />
     </Tab.Navigator>
+  );
+}
+
+// --- Root Stack (Tabs + AddTransaction) ---
+function AppStack() {
+  return (
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Screen name="MainTabs" component={MainTabs} />
+      <RootStack.Screen
+        name="AddTransaction"
+        component={AddTransactionScreen}
+      />
+    </RootStack.Navigator>
   );
 }
 
@@ -139,7 +141,7 @@ export default function App() {
     return unsub;
   }, [initializing]);
 
-  if (initializing) return null; // simple splash-less wait; keeps this step minimal
+  if (initializing) return null;
 
   return (
     <PaperProvider>

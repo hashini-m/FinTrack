@@ -18,6 +18,11 @@ import { syncPendingTransactions } from "../services/syncService";
 import { Ionicons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
 
+import FormInput from "../components/FormInput";
+import TypeToggle from "../components/TypeToggle";
+import ActionButton from "../components/ActionButton";
+import PrimaryButton from "../components/PrimaryButton";
+
 export default function AddTransactionScreen({ navigation }) {
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("expense");
@@ -124,55 +129,15 @@ export default function AddTransactionScreen({ navigation }) {
           Add Transaction
         </Text>
 
-        {/* Amount */}
-        <Text style={{ fontWeight: "600", marginBottom: 6 }}>Amount</Text>
-        <TextInput
-          keyboardType="numeric"
+        <FormInput
+          label="Amount"
           value={amount}
           onChangeText={setAmount}
           placeholder="Enter amount"
-          style={{
-            borderWidth: 1,
-            borderColor: "#cbd5e1",
-            marginBottom: 14,
-            padding: 10,
-            borderRadius: 8,
-            backgroundColor: "#fff",
-          }}
+          keyboardType="numeric"
         />
+        <TypeToggle type={type} setType={setType} />
 
-        {/* Type toggle */}
-        <Text style={{ fontWeight: "600", marginBottom: 6 }}>Type</Text>
-        <View style={{ flexDirection: "row", marginBottom: 16 }}>
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              backgroundColor: type === "expense" ? "#fee2e2" : "#f1f5f9",
-              padding: 12,
-              borderRadius: 8,
-              alignItems: "center",
-              marginRight: 8,
-            }}
-            onPress={() => setType("expense")}
-          >
-            <Text style={{ color: "#dc2626", fontWeight: "600" }}>Expense</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              backgroundColor: type === "income" ? "#dcfce7" : "#f1f5f9",
-              padding: 12,
-              borderRadius: 8,
-              alignItems: "center",
-            }}
-            onPress={() => setType("income")}
-          >
-            <Text style={{ color: "#16a34a", fontWeight: "600" }}>Income</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Category */}
         <Text style={{ fontWeight: "600", marginBottom: 6 }}>Category</Text>
         <Dropdown
           style={{
@@ -186,14 +151,7 @@ export default function AddTransactionScreen({ navigation }) {
           }}
           placeholderStyle={{ fontSize: 14, color: "#94a3b8" }}
           selectedTextStyle={{ fontSize: 14, color: "#0f172a" }}
-          data={[
-            { label: "Food", value: "Food" },
-            { label: "Transport", value: "Transport" },
-            { label: "Shopping", value: "Shopping" },
-            { label: "Bills", value: "Bills" },
-            { label: "Health", value: "Health" },
-            { label: "Other", value: "Other" },
-          ]}
+          data={categoryOptions}
           labelField="label"
           valueField="value"
           placeholder="Select Category"
@@ -201,107 +159,46 @@ export default function AddTransactionScreen({ navigation }) {
           onChange={(item) => setCategory(item.value)}
         />
 
-        {/* Note */}
-        <Text style={{ fontWeight: "600", marginBottom: 6 }}>
-          Note (optional)
-        </Text>
-        <TextInput
+        <FormInput
+          label="Note (optional)"
           value={note}
           onChangeText={setNote}
           placeholder="Add a note..."
-          style={{
-            borderWidth: 1,
-            borderColor: "#cbd5e1",
-            marginBottom: 20,
-            padding: 10,
-            borderRadius: 8,
-            backgroundColor: "#fff",
-          }}
         />
 
-        {/* Photo */}
-        <TouchableOpacity
+        <ActionButton
+          icon="camera-outline"
+          label="Take Photo"
+          color="#0369a1"
+          bgColor="#e0f2fe"
           onPress={onTakePhoto}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            padding: 12,
-            backgroundColor: "#e0f2fe",
-            borderRadius: 8,
-            marginBottom: 10,
-          }}
-        >
-          <Ionicons
-            name="camera-outline"
-            size={20}
-            color="#0369a1"
-            style={{ marginRight: 8 }}
-          />
-          <Text style={{ fontWeight: "600", color: "#0369a1" }}>
-            Take Photo
-          </Text>
-        </TouchableOpacity>
+        />
         {photoUri && (
           <Image
             source={{ uri: photoUri }}
             style={{
               width: 120,
               height: 120,
-              marginVertical: 10,
               borderRadius: 8,
+              marginVertical: 10,
             }}
           />
         )}
 
-        {/* Location */}
-        <TouchableOpacity
+        <ActionButton
+          icon="location-outline"
+          label="Get Location"
+          color="#ca8a04"
+          bgColor="#fef9c3"
           onPress={onGetLocation}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            padding: 12,
-            backgroundColor: "#fef9c3",
-            borderRadius: 8,
-            marginBottom: 10,
-          }}
-        >
-          <Ionicons
-            name="location-outline"
-            size={20}
-            color="#ca8a04"
-            style={{ marginRight: 8 }}
-          />
-          <Text style={{ fontWeight: "600", color: "#ca8a04" }}>
-            Get Location
-          </Text>
-        </TouchableOpacity>
+        />
         {coords && (
           <Text style={{ marginVertical: 8, fontSize: 13, color: "#475569" }}>
             📍 {address ? address : `${coords.lat}, ${coords.lon}`}
           </Text>
         )}
 
-        {/* Save */}
-        <TouchableOpacity
-          onPress={onSave}
-          style={{
-            backgroundColor: "#0d9488",
-            padding: 14,
-            borderRadius: 10,
-            marginTop: 20,
-          }}
-        >
-          <Text
-            style={{
-              color: "#fff",
-              fontWeight: "700",
-              textAlign: "center",
-              fontSize: 16,
-            }}
-          >
-            Save Transaction
-          </Text>
-        </TouchableOpacity>
+        <PrimaryButton label="Save Transaction" onPress={onSave} />
       </ScrollView>
     </KeyboardAvoidingView>
   );

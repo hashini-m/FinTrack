@@ -1,14 +1,8 @@
 import React from "react";
 import { View } from "react-native";
-import { Text, Badge, Button } from "react-native-paper";
-import { Ionicons } from "@expo/vector-icons";
+import { Text, Badge } from "react-native-paper";
 
-export default function HeaderRibbon({
-  title,
-  pendingCount = 0,
-  onSignOut,
-  isOnline,
-}) {
+export default function HeaderRibbon({ title, pendingCount = 0, isOnline }) {
   return (
     <View
       style={{
@@ -16,61 +10,43 @@ export default function HeaderRibbon({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: 12,
-        backgroundColor: "#1e293b", // slate gray (modern fintech feel)
+        paddingHorizontal: 16,
+        backgroundColor: "#1e293b", // slate gray
       }}
     >
-      {/* Breadcrumb text */}
-      <View>
-        {/* Breadcrumb */}
-        <Text>
-          <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>
-            FinTrack
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: "400",
-              color: "white",
-            }}
-          >
-            {"   "}/ {title} {/* ✅ use spaces here */}
-          </Text>
+      {/* Left: Breadcrumbs */}
+      <Text>
+        <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>
+          FinTrack
         </Text>
-
-        {/* Online/Offline status */}
         <Text
           style={{
-            marginTop: 4, // adds spacing below breadcrumb
+            fontSize: 14,
+            fontWeight: "400",
+            color: "white",
+          }}
+        >
+          {"  "}/ {title}
+        </Text>
+      </Text>
+
+      {/* Right: Online Status + Pending Badge */}
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text
+          style={{
+            marginRight: 12,
             color: isOnline ? "lightgreen" : "#f87171",
             fontWeight: "bold",
           }}
         >
           {isOnline ? "Online ✅" : "Offline ⚠️"}
         </Text>
-      </View>
 
-      {/* Right side: pending badge + logout */}
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
         {pendingCount > 0 && (
-          <Badge
-            style={{ marginRight: 12, backgroundColor: "orange" }}
-            size={20}
-          >
+          <Badge style={{ backgroundColor: "orange" }} size={20}>
             {pendingCount}
           </Badge>
         )}
-        <Button
-          mode="text"
-          textColor="white"
-          icon={({ size, color }) => (
-            <Ionicons name="log-out-outline" size={size} color={color} />
-          )}
-          onPress={onSignOut}
-          labelStyle={{ fontSize: 14, color: "white" }}
-        >
-          Logout
-        </Button>
       </View>
     </View>
   );

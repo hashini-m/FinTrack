@@ -12,6 +12,10 @@ import {
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 
+import FormInput from "../components/FormInput";
+import PrimaryButton from "../components/PrimaryButton";
+import AuthFooterLink from "../components/AuthFooterLink";
+
 function errorMessage(code) {
   switch (code) {
     case "auth/invalid-email":
@@ -68,72 +72,30 @@ export default function SignupScreen({ navigation }) {
         Sign up to start tracking your expenses
       </Text>
 
-      {/* Email Input */}
-      <TextInput
+      {/* Inputs */}
+      <FormInput
         placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
-        style={{
-          borderWidth: 1,
-          borderColor: "#cbd5e1",
-          borderRadius: 10,
-          padding: 14,
-          marginBottom: 14,
-          backgroundColor: "#fff",
-        }}
+        autoCapitalize="none"
+        keyboardType="email-address"
       />
-
-      {/* Password Input */}
-      <TextInput
+      <FormInput
         placeholder="Password (min 6)"
-        secureTextEntry
         value={pw}
         onChangeText={setPw}
-        style={{
-          borderWidth: 1,
-          borderColor: "#cbd5e1",
-          borderRadius: 10,
-          padding: 14,
-          marginBottom: 20,
-          backgroundColor: "#fff",
-        }}
+        secureTextEntry
       />
 
       {/* Sign Up Button */}
-      <TouchableOpacity
-        onPress={onSignup}
-        disabled={busy}
-        style={{
-          backgroundColor: busy ? "#94a3b8" : "#0d9488",
-          paddingVertical: 14,
-          borderRadius: 10,
-          alignItems: "center",
-        }}
-      >
-        {busy ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
-            Sign Up
-          </Text>
-        )}
-      </TouchableOpacity>
+      <PrimaryButton label="Sign Up" onPress={onSignup} busy={busy} />
 
       {/* Footer Link */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          marginTop: 20,
-        }}
-      >
-        <Text style={{ color: "#475569" }}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.replace("Login")}>
-          <Text style={{ color: "#0d9488", fontWeight: "700" }}>Log in</Text>
-        </TouchableOpacity>
-      </View>
+      <AuthFooterLink
+        text="Already have an account?"
+        linkText="Log in"
+        onPress={() => navigation.replace("Login")}
+      />
     </KeyboardAvoidingView>
   );
 }

@@ -12,6 +12,10 @@ import {
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 
+import FormInput from "../components/FormInput";
+import PrimaryButton from "../components/PrimaryButton";
+import AuthFooterLink from "../components/AuthFooterLink";
+
 function errorMessage(code) {
   switch (code) {
     case "auth/invalid-email":
@@ -51,7 +55,7 @@ export default function LoginScreen({ navigation }) {
         flex: 1,
         padding: 24,
         justifyContent: "center",
-        backgroundColor: "#f8fafc", // light background
+        backgroundColor: "#f8fafc",
       }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
@@ -70,74 +74,30 @@ export default function LoginScreen({ navigation }) {
         Log in to continue tracking your expenses
       </Text>
 
-      {/* Email Input */}
-      <TextInput
+      {/* Inputs */}
+      <FormInput
         placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
-        style={{
-          borderWidth: 1,
-          borderColor: "#cbd5e1",
-          borderRadius: 10,
-          padding: 14,
-          marginBottom: 14,
-          backgroundColor: "#fff",
-        }}
+        autoCapitalize="none"
+        keyboardType="email-address"
       />
-
-      {/* Password Input */}
-      <TextInput
+      <FormInput
         placeholder="Password"
-        secureTextEntry
         value={pw}
         onChangeText={setPw}
-        style={{
-          borderWidth: 1,
-          borderColor: "#cbd5e1",
-          borderRadius: 10,
-          padding: 14,
-          marginBottom: 20,
-          backgroundColor: "#fff",
-        }}
+        secureTextEntry
       />
 
       {/* Login Button */}
-      <TouchableOpacity
-        onPress={onLogin}
-        disabled={busy}
-        style={{
-          backgroundColor: busy ? "#94a3b8" : "#0d9488", // teal when active, gray when busy
-          paddingVertical: 14,
-          borderRadius: 10,
-          alignItems: "center",
-        }}
-      >
-        {busy ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
-            Log In
-          </Text>
-        )}
-      </TouchableOpacity>
+      <PrimaryButton label="Log In" onPress={onLogin} />
 
       {/* Footer Link */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          marginTop: 20,
-        }}
-      >
-        <Text style={{ color: "#475569" }}>New here? </Text>
-        <TouchableOpacity onPress={() => navigation.replace("Signup")}>
-          <Text style={{ color: "#0d9488", fontWeight: "700" }}>
-            Create an account
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <AuthFooterLink
+        text="New here?"
+        linkText="Create an account"
+        onPress={() => navigation.replace("Signup")}
+      />
     </KeyboardAvoidingView>
   );
 }
