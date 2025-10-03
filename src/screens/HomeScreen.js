@@ -26,6 +26,28 @@ export default function HomeScreen({ navigation }) {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
 
+  const handleDelete = async (id) => {
+    Alert.alert("Delete Transaction", "Are you sure?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteTransaction(auth.currentUser.uid, id);
+            await loadData(); // refresh list
+            setSnackbarMsg("✅ Transaction deleted");
+            setSnackbarVisible(true);
+          } catch (e) {
+            console.error("Delete failed", e);
+            setSnackbarMsg("❌ Failed to delete");
+            setSnackbarVisible(true);
+          }
+        },
+      },
+    ]);
+  };
+
   const loadData = async () => {
     const res = await getTransactions(auth.currentUser.uid);
     setTransactions(res);
@@ -36,15 +58,31 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     if (transactions.length > 0) {
-      const expenses = transactions
-        .filter((t) => t.type === "expense")
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+
+      const monthlyExpenses = transactions
+        .filter((t) => {
+          if (t.type !== "expense") return false;
+          const d = new Date(t.created_at);
+          return (
+            d.getFullYear() === currentYear && d.getMonth() === currentMonth
+          );
+        })
         .reduce((sum, t) => sum + t.amount, 0);
 
-      const income = transactions
-        .filter((t) => t.type === "income")
+      const monthlyIncome = transactions
+        .filter((t) => {
+          if (t.type !== "income") return false;
+          const d = new Date(t.created_at);
+          return (
+            d.getFullYear() === currentYear && d.getMonth() === currentMonth
+          );
+        })
         .reduce((sum, t) => sum + t.amount, 0);
 
-      const ratio = income > 0 ? expenses / income : 0;
+      const ratio = monthlyIncome > 0 ? monthlyExpenses / monthlyIncome : 0;
       setProgress(Math.min(ratio, 1));
     }
   }, [transactions]);
