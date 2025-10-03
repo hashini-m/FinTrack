@@ -3,11 +3,11 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
@@ -38,7 +38,6 @@ export default function LoginScreen({ navigation }) {
     setBusy(true);
     try {
       await signInWithEmailAndPassword(auth, email.trim(), pw);
-      // onAuthStateChanged in App.js will switch stacks automatically
     } catch (e) {
       Alert.alert("Error", errorMessage(e.code));
     } finally {
@@ -48,12 +47,30 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, padding: 20, justifyContent: "center" }}
+      style={{
+        flex: 1,
+        padding: 24,
+        justifyContent: "center",
+        backgroundColor: "#f8fafc", // light background
+      }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Text style={{ fontSize: 24, fontWeight: "600", marginBottom: 16 }}>
-        Welcome back
+      {/* Title */}
+      <Text
+        style={{
+          fontSize: 28,
+          fontWeight: "700",
+          color: "#0f172a",
+          marginBottom: 8,
+        }}
+      >
+        Welcome Back
       </Text>
+      <Text style={{ fontSize: 14, color: "#64748b", marginBottom: 24 }}>
+        Log in to continue tracking your expenses
+      </Text>
+
+      {/* Email Input */}
       <TextInput
         placeholder="Email"
         autoCapitalize="none"
@@ -62,11 +79,15 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setEmail}
         style={{
           borderWidth: 1,
-          borderRadius: 8,
-          padding: 12,
-          marginBottom: 12,
+          borderColor: "#cbd5e1",
+          borderRadius: 10,
+          padding: 14,
+          marginBottom: 14,
+          backgroundColor: "#fff",
         }}
       />
+
+      {/* Password Input */}
       <TextInput
         placeholder="Password"
         secureTextEntry
@@ -74,21 +95,45 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setPw}
         style={{
           borderWidth: 1,
-          borderRadius: 8,
-          padding: 12,
-          marginBottom: 16,
+          borderColor: "#cbd5e1",
+          borderRadius: 10,
+          padding: 14,
+          marginBottom: 20,
+          backgroundColor: "#fff",
         }}
       />
-      <Button
-        title={busy ? "Signing in..." : "Log in"}
+
+      {/* Login Button */}
+      <TouchableOpacity
         onPress={onLogin}
         disabled={busy}
-      />
+        style={{
+          backgroundColor: busy ? "#94a3b8" : "#0d9488", // teal when active, gray when busy
+          paddingVertical: 14,
+          borderRadius: 10,
+          alignItems: "center",
+        }}
+      >
+        {busy ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+            Log In
+          </Text>
+        )}
+      </TouchableOpacity>
 
-      <View style={{ flexDirection: "row", marginTop: 16 }}>
-        <Text>New here? </Text>
+      {/* Footer Link */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          marginTop: 20,
+        }}
+      >
+        <Text style={{ color: "#475569" }}>New here? </Text>
         <TouchableOpacity onPress={() => navigation.replace("Signup")}>
-          <Text style={{ color: "#2563eb", fontWeight: "600" }}>
+          <Text style={{ color: "#0d9488", fontWeight: "700" }}>
             Create an account
           </Text>
         </TouchableOpacity>
