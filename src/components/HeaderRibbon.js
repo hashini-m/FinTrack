@@ -18,7 +18,6 @@ export default function HeaderRibbon({
         justifyContent: "space-between",
         paddingHorizontal: 12,
         backgroundColor: "#1e293b", // slate gray (modern fintech feel)
-        // backgroundColor: "#334155", // slate gray (modern fintech feel)
       }}
     >
       {/* Breadcrumb text */}

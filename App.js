@@ -5,6 +5,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { onAuthStateChanged } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 
+import { signOut } from "firebase/auth";
+import { TouchableOpacity, Text } from "react-native";
+
 import { runMigrations } from "./src/storage/db";
 import { auth } from "./src/firebase"; // initializes Firebase via src/firebase/index.js
 
@@ -64,25 +67,42 @@ function AppStack() {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Analytics") {
             iconName = focused ? "bar-chart" : "bar-chart-outline";
+          } else if (route.name === "Logout") {
+            iconName = focused ? "log-out" : "log-out-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#0d9488", // teal when active
+        tabBarActiveTintColor: "#0d9488", // teal
         tabBarInactiveTintColor: "gray",
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
-      {/* hidden AddTransaction route */}
+
+      {/* Logout Tab */}
       <Tab.Screen
-        name="AddTransaction"
-        component={AddTransactionScreen}
-        options={{ tabBarButton: () => null, headerShown: false }}
+        name="Logout"
+        component={HomeScreen} // dummy, not used
+        options={{
+          tabBarLabel: "Logout",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="log-out-outline" size={size} color={color} />
+          ),
+          tabBarButton: (props) => (
+            <TouchableOpacity
+              {...props}
+              onPress={async () => {
+                await signOut(auth);
+              }}
+            />
+          ),
+        }}
       />
     </Tab.Navigator>
   );
 }
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);

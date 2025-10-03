@@ -16,45 +16,33 @@ import HeaderRibbon from "../components/HeaderRibbon";
 import { deleteTransaction } from "../services/transactionService";
 import { Snackbar } from "react-native-paper";
 import { Alert } from "react-native";
+import PrimaryButton from "../components/PrimaryButton";
 
 export default function HomeScreen({ navigation }) {
   const [transactions, setTransactions] = useState([]);
   const [isOnline, setIsOnline] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
   const [progress, setProgress] = useState(0);
-
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
 
-  const handleDelete = async (id) => {
-    Alert.alert("Delete Transaction", "Are you sure?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteTransaction(auth.currentUser.uid, id);
-            await loadData(); // refresh list
-            setSnackbarMsg("✅ Transaction deleted");
-            setSnackbarVisible(true);
-          } catch (e) {
-            console.error("Delete failed", e);
-            setSnackbarMsg("❌ Failed to delete");
-            setSnackbarVisible(true);
-          }
-        },
-      },
-    ]);
-  };
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsOnline(state.isConnected ?? false);
+      if (state.isConnected) {
+        fullSync();
+      }
+    });
+    return unsubscribe;
+  }, []);
 
-  const loadData = async () => {
-    const res = await getTransactions(auth.currentUser.uid);
-    setTransactions(res);
-
-    const count = await countPendingTransactions(auth.currentUser.uid);
-    setPendingCount(count);
-  };
+  useEffect(() => {
+    const unsubscribeNav = navigation.addListener("focus", async () => {
+      await fullSync();
+      await loadData();
+    });
+    return unsubscribeNav;
+  }, [navigation]);
 
   useEffect(() => {
     if (transactions.length > 0) {
@@ -87,26 +75,38 @@ export default function HomeScreen({ navigation }) {
     }
   }, [transactions]);
 
-  useEffect(() => {
-    const unsubscribeNav = navigation.addListener("focus", async () => {
-      await fullSync();
-      await loadData();
-    });
-    return unsubscribeNav;
-  }, [navigation]);
-
-  useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsOnline(state.isConnected ?? false);
-      if (state.isConnected) {
-        fullSync();
-      }
-    });
-    return unsubscribe;
-  }, []);
-
   const onSignOut = async () => {
     await signOut(auth);
+  };
+
+  const loadData = async () => {
+    const res = await getTransactions(auth.currentUser.uid);
+    setTransactions(res);
+
+    const count = await countPendingTransactions(auth.currentUser.uid);
+    setPendingCount(count);
+  };
+
+  const handleDelete = async (id) => {
+    Alert.alert("Delete Transaction", "Are you sure?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteTransaction(auth.currentUser.uid, id);
+            await loadData(); // refresh list
+            setSnackbarMsg("✅ Transaction deleted");
+            setSnackbarVisible(true);
+          } catch (e) {
+            console.error("Delete failed", e);
+            setSnackbarMsg("❌ Failed to delete");
+            setSnackbarVisible(true);
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -141,30 +141,11 @@ export default function HomeScreen({ navigation }) {
         </Card>
 
         {/* Add Transaction Button */}
-        <Button
-          mode="contained"
+        <PrimaryButton
+          label="Add Transaction"
           icon="plus-circle-outline"
-          buttonColor="#0d9488" // teal green
-          textColor="white"
-          style={{
-            marginBottom: 16,
-            borderRadius: 12,
-            elevation: 4, // shadow on Android
-          }}
-          labelStyle={{
-            fontSize: 16,
-            fontWeight: "600",
-            letterSpacing: 0.5,
-          }}
-          contentStyle={{
-            paddingVertical: 6, // makes it taller
-          }}
           onPress={() => navigation.navigate("AddTransaction")}
-        >
-          Add Transaction
-        </Button>
-
-        <Divider style={{ marginBottom: 16 }} />
+        />
 
         {/* Transaction List (scrollable because wrapped in ScrollView) */}
         {transactions.map((item) => (
@@ -185,6 +166,7 @@ export default function HomeScreen({ navigation }) {
           />
         ))}
       </ScrollView>
+
       <Snackbar
         visible={snackbarVisible}
         onDismiss={() => setSnackbarVisible(false)}
