@@ -117,7 +117,7 @@ export default function AnalyticsScreen() {
       <ScrollView contentContainerStyle={{ padding: 12 }}>
         {/* Totals Card */}
         <Card style={{ marginVertical: 12 }}>
-          <Card.Title title="Totals" />
+          {/* <Card.Title title="Totals" /> */}
           <Card.Content>
             <Text style={{ fontSize: 16, color: "#059669", fontWeight: "600" }}>
               Income: {totals.income.toFixed(2)}
@@ -147,33 +147,95 @@ export default function AnalyticsScreen() {
         </Card>
 
         {/* Pie Chart Card */}
-        <Card style={{ marginVertical: 12 }}>
-          <Card.Title title="Expenses by Category" />
+        <Card
+          style={{
+            marginVertical: 12,
+            borderRadius: 14,
+            elevation: 3,
+            shadowColor: "#000",
+            shadowOpacity: 0.1,
+            shadowRadius: 6,
+          }}
+        >
+          <Card.Title
+            title="Expenses by Category"
+            titleStyle={{ fontSize: 18, fontWeight: "700", color: "#0f172a" }}
+            subtitle="Distribution of your spending"
+            subtitleStyle={{ fontSize: 13, color: "#64748b" }}
+          />
+
           <Card.Content>
             {categoryData.length === 0 ? (
-              <Text>No expenses yet</Text>
-            ) : (
-              <PieChart
-                data={categoryData.map((d) => ({
-                  name: d.name,
-                  population: d.amount,
-                  color: d.color,
-                  legendFontColor: d.legendFontColor,
-                  legendFontSize: d.legendFontSize,
-                }))}
-                width={screenWidth - 48} // padding adjustment
-                height={220}
-                chartConfig={{
-                  backgroundColor: "#fff",
-                  backgroundGradientFrom: "#fff",
-                  backgroundGradientTo: "#fff",
-                  color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
+              <Text
+                style={{
+                  textAlign: "center",
+                  paddingVertical: 20,
+                  color: "#64748b",
                 }}
-                accessor="population"
-                backgroundColor="transparent"
-                paddingLeft="15"
-                absolute
-              />
+              >
+                No expenses yet
+              </Text>
+            ) : (
+              <>
+                {/* Chart */}
+                <PieChart
+                  data={categoryData.map((d) => ({
+                    name: d.name,
+                    population: d.amount,
+                    color: d.color,
+                  }))}
+                  width={screenWidth - 48}
+                  height={220}
+                  chartConfig={{
+                    backgroundColor: "#fff",
+                    backgroundGradientFrom: "#fff",
+                    backgroundGradientTo: "#fff",
+                    color: (opacity = 1) => `rgba(13, 148, 136, ${opacity})`,
+                  }}
+                  accessor="population"
+                  backgroundColor="transparent"
+                  paddingLeft="15"
+                  absolute
+                  hasLegend={false} // ✅ hides default legend
+                />
+
+                {/* Divider */}
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "#e2e8f0",
+                    marginVertical: 12,
+                  }}
+                />
+
+                {/* Custom Legend */}
+                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                  {categoryData.map((d, idx) => (
+                    <View
+                      key={idx}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginRight: 16,
+                        marginBottom: 8,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 12,
+                          height: 12,
+                          backgroundColor: d.color,
+                          borderRadius: 3,
+                          marginRight: 6,
+                        }}
+                      />
+                      <Text style={{ fontSize: 13, color: "#334155" }}>
+                        {d.name} ({d.amount})
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </>
             )}
           </Card.Content>
         </Card>
